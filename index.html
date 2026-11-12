@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Anamnesis — practise the patient you cannot understand</title>
+<meta name="description" content="A medical student can finish six years without ever taking a history unaided, because the patient speaks a language they never learned. Sit in that chair for two minutes.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=Newsreader:ital,opsz,wght@0,6..72,300;0,6..72,400;0,6..72,500;1,6..72,300;1,6..72,400&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#E8EAE3;
+  --surface:#FDFDFB;
+  --ink:#1B2B2A;
+  --sage:#5A6B62;
+  --rule:#C3C9C0;
+  --ochre:#B4621F;
+  --oxblood:#8C1D18;
+  --serif:"Newsreader",Georgia,"Times New Roman",serif;
+  --sans:"IBM Plex Sans",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{
+  margin:0;background:var(--paper);color:var(--ink);
+  font-family:var(--sans);font-size:17px;line-height:1.6;
+  -webkit-font-smoothing:antialiased;
+}
+.wrap{max-width:940px;margin:0 auto;padding:0 24px}
+.narrow{max-width:620px}
+section{padding:72px 0;border-top:1px solid var(--rule)}
+section:first-of-type{border-top:0}
+h1,h2,h3{font-family:var(--serif);font-weight:400;letter-spacing:-.01em}
+p{margin:0 0 1em}
+a{color:var(--ink)}
+:focus-visible{outline:2px solid var(--ochre);outline-offset:3px}
+
+.hero{padding:96px 0 80px}
+.hero h1{
+  font-size:clamp(2.2rem,6.2vw,4rem);line-height:1.08;margin:0 0 28px;
+  max-width:15ch;font-weight:300;
+}
+.hero h1 em{font-style:italic}
+.hero .lede{font-family:var(--serif);font-size:1.24rem;line-height:1.62;max-width:56ch;color:#2C3B39}
+.stamp{
+  font-family:var(--sans);font-size:.76rem;letter-spacing:.09em;
+  color:var(--sage);margin:0 0 34px;
+}
+.stamp b{font-weight:600;color:var(--ink)}
+
+.probe{
+  background:var(--surface);border:1px solid var(--rule);
+  padding:26px 26px 22px;max-width:600px;
+}
+.probe h2{font-size:1.32rem;margin:0 0 10px}
+.probe p{font-size:.95rem;color:var(--sage);margin-bottom:16px}
+button{font-family:var(--sans);font-size:.95rem;cursor:pointer}
+.btn{
+  background:var(--ink);color:var(--paper);border:1px solid var(--ink);
+  padding:11px 20px;font-weight:500;
+}
+.btn:hover{background:#0F1C1B}
+.btn-ghost{
+  background:transparent;color:var(--ink);border:1px solid var(--ink);
+  padding:9px 16px;
+}
+.btn-ghost:hover{background:rgba(27,43,42,.06)}
+.btn[disabled],.btn-ghost[disabled]{opacity:.4;cursor:not-allowed}
+#probeOut{margin-top:18px;font-size:.95rem;display:none}
+#probeOut .big{
+  font-family:var(--serif);font-size:2.6rem;line-height:1.1;display:block;margin-bottom:6px;
+}
+#probeOut .zero{color:var(--oxblood)}
+#probeOut .foot{color:var(--sage);font-size:.85rem;margin-top:12px;line-height:1.5}
+
+.consult{display:grid;grid-template-columns:250px 1fr;gap:0;border:1px solid var(--rule);background:var(--surface)}
+.chart{padding:24px;border-right:1px solid var(--rule);background:#E1E5DD}
+.chart .case{font-size:.74rem;letter-spacing:.1em;color:var(--sage);margin-bottom:14px}
+.chart h3{font-size:1.18rem;margin:0 0 4px}
+.chart .sub{font-size:.9rem;color:var(--sage);margin-bottom:22px;line-height:1.45}
+.meter{margin-bottom:18px}
+.meter .n{font-family:var(--serif);font-size:2.1rem;line-height:1;display:block}
+.meter .l{font-size:.8rem;color:var(--sage);line-height:1.35;display:block;margin-top:3px}
+.meter.hot .n{color:var(--oxblood)}
+
+.talk{display:flex;flex-direction:column;min-height:440px}
+.log{padding:24px;flex:1;overflow-y:auto;max-height:460px}
+.turn{margin-bottom:20px}
+.turn .you{font-size:.94rem;color:var(--sage);margin:0 0 6px}
+.turn .you::before{content:"You  ";color:var(--sage);font-weight:600;font-size:.76rem;letter-spacing:.08em}
+.said{
+  font-family:var(--serif);font-size:1.2rem;line-height:1.5;color:var(--ochre);
+  margin:0;padding-left:14px;border-left:2px solid var(--ochre);
+}
+.gloss{
+  font-size:.93rem;color:var(--sage);margin:8px 0 0 14px;
+  display:none;font-style:italic;
+}
+.turn.open .gloss{display:block}
+.reveal{
+  background:none;border:0;padding:4px 0 0 14px;color:var(--sage);
+  font-size:.82rem;text-decoration:underline;text-underline-offset:3px;
+}
+.reveal:hover{color:var(--ink)}
+.turn.open .reveal{display:none}
+.ask{border-top:1px solid var(--rule);padding:16px 24px;display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.ask input{
+  flex:1;min-width:180px;font-family:var(--sans);font-size:1rem;
+  padding:11px 13px;border:1px solid var(--rule);background:var(--surface);color:var(--ink);
+}
+.ask input:focus{border-color:var(--ink);outline:none}
+.hint{padding:0 24px 16px;font-size:.84rem;color:var(--sage)}
+.hint b{font-weight:500;color:var(--ink)}
+.starter{
+  background:transparent;border:1px solid var(--rule);color:var(--sage);
+  padding:5px 10px;font-size:.82rem;margin:0 6px 6px 0;
+}
+.starter:hover{border-color:var(--ink);color:var(--ink)}
+.endbar{padding:0 24px 22px}
+
+#verdict{display:none}
+.vhead{font-family:var(--serif);font-size:clamp(1.5rem,3.4vw,2.1rem);line-height:1.25;max-width:26ch;margin:0 0 24px;font-weight:300}
+.vhead .bleed{color:var(--oxblood)}
+.rub{border-top:1px solid var(--rule);margin-top:8px}
+.rub .row{display:flex;gap:14px;padding:11px 0;border-bottom:1px solid var(--rule);align-items:baseline}
+.rub .mk{font-size:.9rem;width:16px;flex:none;font-weight:600}
+.rub .got .mk{color:#2F6B4F}
+.rub .miss .mk{color:var(--sage)}
+.rub .crit.miss .mk{color:var(--oxblood)}
+.rub .lbl{flex:1;font-size:.97rem}
+.rub .miss .lbl{color:var(--sage)}
+.rub .crit.miss .lbl{color:var(--oxblood)}
+.rub .tag{font-size:.76rem;color:var(--sage);letter-spacing:.06em}
+.truth{
+  background:var(--surface);border:1px solid var(--rule);
+  border-left:3px solid var(--oxblood);padding:22px 24px;margin-top:32px;
+}
+.truth h3{font-size:1.15rem;margin:0 0 10px}
+.truth p{font-size:.97rem;margin-bottom:.7em}
+.truth p:last-child{margin-bottom:0}
+
+.prose h2{font-size:clamp(1.5rem,3.4vw,2rem);margin:0 0 20px;font-weight:300;max-width:22ch}
+.prose p{max-width:64ch;font-family:var(--serif);font-size:1.08rem;line-height:1.68}
+.facts{list-style:none;padding:0;margin:26px 0 0;max-width:64ch}
+.facts li{padding:13px 0;border-top:1px solid var(--rule);font-size:.97rem;display:flex;gap:16px}
+.facts li span:first-child{flex:none;width:96px;color:var(--sage);font-size:.86rem;padding-top:2px}
+footer{padding:56px 0 76px;border-top:1px solid var(--rule);font-size:.93rem;color:var(--sage)}
+footer a{color:var(--ink)}
+.note{font-size:.86rem;color:var(--sage);max-width:64ch;line-height:1.6}
+
+@media(max-width:760px){
+  .consult{grid-template-columns:1fr}
+  .chart{border-right:0;border-bottom:1px solid var(--rule);display:flex;flex-wrap:wrap;gap:20px}
+  .chart .hdr{width:100%}
+  .chart .sub{margin-bottom:0}
+  .meter{margin-bottom:0}
+  section{padding:56px 0}
+  .hero{padding:64px 0 56px}
+}
+@media(prefers-reduced-motion:no-preference){
+  .turn{animation:rise .34s ease-out}
+  @keyframes rise{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+}
+</style>
+</head>
+<body>
+
+<section class="hero">
+  <div class="wrap">
+    <p class="stamp">Anamnesis &nbsp;/&nbsp; <b>Bukhara</b> &nbsp;/&nbsp; working demonstration</p>
+    <h1>He is telling you what is wrong. You <em>cannot</em> hear it.</h1>
+    <p class="lede">A medical student can complete six years in Uzbekistan, pass every examination, and receive a diploma without once having taken a full history from a patient unaided — because the patient speaks Uzbek and the student was taught in English. Sit in that chair for two minutes and see what you come away with.</p>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <div class="probe">
+      <h2>First, ask your own computer</h2>
+      <p>Anamnesis needs a machine that can speak to a patient in their language. Here is what yours can do — measured live, on your device, right now.</p>
+      <button class="btn" id="probeBtn">Check this device</button>
+      <div id="probeOut"></div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <div class="consult">
+      <div class="chart">
+        <div class="hdr">
+          <p class="case">Case uz-014</p>
+          <h3>Anvar Rasulov</h3>
+          <p class="sub">68 years old. Retired driver, Bukhara. Referred by his family doctor with three months of stomach pain.</p>
+        </div>
+        <div class="meter" id="mQ"><span class="n">0</span><span class="l">questions asked</span></div>
+        <div class="meter" id="mT"><span class="n">0</span><span class="l">times you needed it translated</span></div>
+      </div>
+
+      <div class="talk">
+        <div class="log" id="log">
+          <div class="turn open">
+            <p class="said">Assalomu alaykum, oʻgʻlim.</p>
+            <p class="gloss">Peace be upon you, my son.</p>
+          </div>
+        </div>
+        <div class="hint">He answers only what you ask him. He will not volunteer anything — <b>real patients don't.</b></div>
+        <div class="ask">
+          <input id="q" type="text" autocomplete="off" placeholder="Ask him something…" aria-label="Ask the patient a question">
+          <button class="btn" id="send">Ask</button>
+        </div>
+        <div class="endbar">
+          <button class="starter" data-s="What brings you in today?">What brings you in today?</button>
+          <button class="starter" data-s="Where exactly is the pain?">Where exactly is the pain?</button>
+          <button class="starter" data-s="How long has this been going on?">How long has this been going on?</button>
+          <button class="btn-ghost" id="end" style="margin-top:8px">End the consultation</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="verdict">
+  <div class="wrap">
+    <h2 class="vhead" id="vhead"></h2>
+    <div class="rub" id="rub"></div>
+    <div class="truth">
+      <h3>What was actually wrong with him</h3>
+      <p>Anvar has a bleeding gastric ulcer. He has taken diclofenac every day for a year for his knee, bought over the counter, without a doctor. His stool has been black for three weeks. He has lost six kilograms. His brother died of stomach cancer at sixty-five, which is why he is frightened, and why he did not say so.</p>
+      <p>None of that arrives on its own. Every piece of it requires a specific question, asked out loud, in a language the student does not have.</p>
+    </div>
+  </div>
+</section>
+
+<section class="prose">
+  <div class="wrap narrow">
+    <h2>What Anamnesis is</h2>
+    <p>An AI simulated patient that speaks the clinical language of the country a student is training in, so that a student can practise the one skill they currently cannot practise: taking a complete history, alone, from someone who does not share their language. Every session is scored against the same rubric a human examiner would use, and the student is shown exactly what they failed to ask.</p>
+    <p>The buyer is the university, not the student. Universities are accredited on clinical competence and carry the cost of graduates who cannot communicate.</p>
+  </div>
+</section>
+
+<section class="prose">
+  <div class="wrap narrow">
+    <h2>What is built, and what is not</h2>
+    <ul class="facts">
+      <li><span>Built</span><span>This consultation. A scripted case with a hidden diagnosis and rubric scoring — the interaction model, working.</span></li>
+      <li><span>Built</span><span>A speech-recognition benchmark for clinical Uzbek and Russian, at <a href="https://anamnesis-bench.vercel.app">anamnesis-bench.vercel.app</a>. Measuring whether the words survive the microphone.</span></li>
+      <li><span>Not built</span><span>Live voice. Uzbek speech recognition is the hard engineering problem and we are measuring it before we build on it, not after.</span></li>
+      <li><span>Not built</span><span>Generated cases. This one is written by hand.</span></li>
+      <li><span>Not run</span><span>The validation study comparing our rubric scoring against blinded human examiners. It is designed. Running it is why we are applying.</span></li>
+    </ul>
+    <p class="note" style="margin-top:30px">This demonstration makes no diagnostic claim, involves no real patient, and collects no data. Nothing you type leaves this page. The case is fictional and written for teaching. Uzbek dialogue is pending review by a native clinical speaker.</p>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap narrow">
+    <p>Anamnesis is built in Bukhara by a medical student who could not take a history from his own patients. Co-author, <em>Fundamental Principles of the Surgical Department</em> (Bukhara, 2026), approved by the Ministry of Health of Uzbekistan.</p>
+    <p style="margin-bottom:0"><a href="https://anamnesis-bench.vercel.app">Technical benchmark</a></p>
+  </div>
+</footer>
+
+<script>
+(function(){
+"use strict";
+
+var probeBtn=document.getElementById("probeBtn"),probeOut=document.getElementById("probeOut");
+function runProbe(){
+  var voices=[];
+  try{voices=window.speechSynthesis?speechSynthesis.getVoices():[];}catch(e){voices=[];}
+  var langs={},uz=[];
+  voices.forEach(function(v){
+    if(!v.lang)return;
+    var base=v.lang.toLowerCase().split(/[-_]/)[0];
+    langs[base]=1;
+    if(base==="uz")uz.push(v.lang);
+  });
+  var n=Object.keys(langs).length;
+  probeOut.style.display="block";
+  if(!voices.length){
+    probeOut.innerHTML='<p style="margin:0">This browser did not report any speech voices. Try Chrome or Edge on a desktop — the point below holds either way.</p>'+
+      '<p class="foot">Anamnesis needs a machine that can both hear and speak the patient\u2019s language. On most devices sold in Central Asia, Uzbek is absent from both halves.</p>';
+    return;
+  }
+  if(uz.length){
+    probeOut.innerHTML='<span class="big">'+n+'</span> languages your device can speak aloud — and it does have Uzbek ('+uz.join(", ")+'). You are in a small minority.'+
+      '<p class="foot">Speaking is the easier half. Understanding an elderly patient in a noisy Bukhara ward is the half we are benchmarking.</p>';
+    return;
+  }
+  probeOut.innerHTML='<span class="big">'+n+'</span> languages your device can speak aloud.'+
+    '<p style="margin:10px 0 0"><span class="zero" style="font-weight:600">Uzbek is not one of them.</span> Neither is it one of the '+voices.length+' voices installed.</p>'+
+    '<p class="foot">Thirty-five million people. Not a single voice on your machine. This is the floor Anamnesis has to build from — and it is why the first thing we shipped was a measurement, not a product.</p>';
+}
+probeBtn.addEventListener("click",function(){
+  runProbe();
+  probeBtn.disabled=true;probeBtn.textContent="Checked";
+});
+if(window.speechSynthesis&&typeof speechSynthesis.getVoices==="function"){try{speechSynthesis.getVoices();}catch(e){}}
+
+var SCRIPT=[
+ {id:"greet",k:["hello","hi","salom","assalom","good morning","good afternoon","my name","i am dr","introduce"],
+  uz:"Va alaykum assalom. Rahmat, oʻgʻlim. Oʻtiraymi?",en:"And peace be upon you. Thank you, my son. May I sit down?"},
+ {id:"consent",k:["may i ask","is it ok","permission","do you mind","can i ask you some"],
+  uz:"Albatta, soʻrang. Men shuning uchun keldim.",en:"Of course, ask. That is why I came."},
+ {id:"open",k:["what brings","how can i help","what is the problem","whats wrong","what's wrong","tell me","why are you here","what happened","complaint"],
+  uz:"Qornim ogʻriydi. Uch oydan beri. Kechalari yomonroq boʻladi.",en:"My stomach hurts. For three months now. It gets worse at night."},
+ {id:"site",k:["where","which part","site","point to","location","exactly is the pain"],
+  uz:"Mana shu yerda. Kindigimning tepasida, oʻrtada.",en:"Right here. Above my navel, in the middle."},
+ {id:"onset",k:["how long","when did","start","began","begin","duration","since when","onset"],
+  uz:"Uch oy boʻldi. Sekin-asta boshlandi, birdan emas.",en:"Three months. It started slowly, not suddenly."},
+ {id:"character",k:["what kind","describe the pain","character","sharp","burning","dull","feel like","type of pain","ache"],
+  uz:"Kemirayotgandek. Achishadi. Och qolganimda yomonroq.",en:"Like something gnawing. A burning. Worse when I am hungry."},
+ {id:"radiation",k:["radiat","spread","move","travel","go to your back","anywhere else"],
+  uz:"Baʼzida orqamga, belimga oʻtadi.",en:"Sometimes it goes through to my back."},
+ {id:"food",k:["food","eat","eating","meal","after you eat","before","hungry","empty stomach","relation to"],
+  uz:"Ovqatdan keyin yomonlashadi. Shuning uchun kam yeyapman.",en:"It gets worse after I eat. That is why I have been eating less."},
+ {id:"night",k:["night","sleep","wake","kecha","at night","wakes you"],
+  uz:"Ha, kechasi ogʻriqdan uygʻonib ketaman. Soatlab yotaman.",en:"Yes, the pain wakes me at night. I lie awake for hours."},
+ {id:"severity",k:["how bad","severity","scale","out of ten","score the pain","severe","worst"],
+  uz:"Baʼzida chidab boʻlmaydi. Oʻn boʻlsa, oltimi, yettimi.",en:"Sometimes I cannot bear it. Out of ten, six or seven."},
+ {id:"relieve",k:["better","relieve","help","reliev","anything ease","what makes it","improve","antacid","soda"],
+  uz:"Soda ichsam biroz yengillashadi. Xotinim tayyorlab beradi.",en:"If I drink baking soda it eases a little. My wife makes it for me."},
+ {id:"nausea",k:["nausea","sick","vomit","throwing up","qusish","koʻngil"],
+  uz:"Koʻnglim aynaydi. Baʼzida qusaman, ovqatdan keyin.",en:"I feel sick. Sometimes I vomit, after food."},
+ {id:"haemat",k:["blood in your vomit","blood in the vomit","vomit blood","vomited blood","vomiting blood","vomit any blood","brought up blood","bringing up blood","coughed up blood","seen any blood","haematemesis","hematemesis","coffee ground","blood when you vomit"],
+  uz:"Yoʻq, qon qusmaganman. Hech qachon.",en:"No, I have never vomited blood. Never."},
+ {id:"melena",k:["stool","bowel","poo","faeces","feces","black","tarry","melena","melaena","toilet","motions","colour of your stool","dark stool"],
+  uz:"Ha... qoramtir. Qop-qora, moyday. Uch haftadan beri shunday. Men buni muhim deb oʻylamagandim.",
+  en:"Yes… dark. Completely black, like oil. For three weeks now. I did not think it mattered.",crit:true},
+ {id:"weight",k:["weight","lost weight","losing weight","kilo","thinner","ozib","clothes loose"],
+  uz:"Ha, ozib ketdim. Shimlarim keng boʻlib qoldi. Olti kilocha boʻlsa kerak.",
+  en:"Yes, I have lost weight. My trousers have gone loose. Perhaps six kilograms.",crit:true},
+ {id:"appetite",k:["appetite","hunger","eating less","full quickly","satiety","ishtaha","how much do you eat"],
+  uz:"Ishtaham yoʻq. Ikki qoshiq yeyman-u, toʻyib qolaman.",en:"I have no appetite. Two spoonfuls and I am full.",crit:true},
+ {id:"dysphagia",k:["swallow","dysphagia","stuck","food going down","choke"],
+  uz:"Yoʻq, yutishim yaxshi. U tomondan shikoyat yoʻq.",en:"No, I swallow fine. No trouble there."},
+ {id:"meds",k:["medicine","medication","tablet","pill","drug","painkiller","nsaid","ibuprofen","diclofenac","aspirin","taking anything","treatment","dori"],
+  uz:"Diklofenak ichaman. Tizzam ogʻriydi. Har kuni, bir yildan beri. Dorixonadan olaman, doktorsiz.",
+  en:"I take diclofenac. My knee hurts. Every day, for the past year. I buy it at the pharmacy, without a doctor.",crit:true},
+ {id:"alcohol",k:["alcohol","drink","vodka","spirits","aroq"],
+  uz:"Yoʻq, ichmayman. Umrimda ichmaganman.",en:"No, I do not drink. I never have."},
+ {id:"smoke",k:["smoke","smoking","cigarette","tobacco","chek"],
+  uz:"Yoshligimda chekkanman. Yigirma yil boʻldi tashlaganimga.",en:"I smoked when I was young. I stopped twenty years ago."},
+ {id:"pmh",k:["past medical","other illness","conditions","diabetes","blood pressure","hypertension","operation","surgery","history of","any other health"],
+  uz:"Qon bosimim bor, dori ichaman. Boshqa hech narsa. Operatsiya qilmaganman.",en:"I have high blood pressure and take something for it. Nothing else. I have never had an operation."},
+ {id:"family",k:["family","father","mother","brother","sister","relative","hereditary","runs in","cancer in your family","aka"],
+  uz:"Akam oshqozon raki bilan vafot etgan. Oltmish beshda edi.",
+  en:"My brother died of stomach cancer. He was sixty-five.",crit:true},
+ {id:"ideas",k:["what do you think","your opinion","what do you believe","do you have any idea","think is causing","think it is"],
+  uz:"Yara bormikan deb oʻylayman. Xotinim ham shunday deydi.",en:"I think there might be an ulcer. My wife says the same."},
+ {id:"concerns",k:["worry","worried","afraid","scared","concern","frightened","fear"],
+  uz:"Rak boʻlishidan qoʻrqaman. Akam ham shunday ketgan edi. Aytishga tilim bormadi.",
+  en:"I am afraid it is cancer. That is how my brother went. I could not bring myself to say it.",crit:true},
+ {id:"expect",k:["what do you want","hope","expect","looking for","hoping","what would you like"],
+  uz:"Tekshiruvdan oʻtsam deyman. Bilsam boʻldi. Bilmaslik yomon.",en:"I would like to be examined. I just want to know. Not knowing is the worst part."},
+ {id:"close",k:["summar","let me repeat","so you are telling","anything else","is there anything","did i miss","thank you for","to summarise","to summarize"],
+  uz:"Hammasini aytdim, oʻgʻlim. Endi siz bilasiz.",en:"I have told you everything, my son. Now you know."}
+];
+
+var CONFUSED=[
+ {uz:"Tushunmadim, oʻgʻlim. Qaytadan ayting?",en:"I did not understand, my son. Say it again?"},
+ {uz:"Kechirasiz? Qulogʻim ogʻirroq.",en:"Sorry? My hearing is not what it was."},
+ {uz:"Nima dedingiz? Sekinroq gapiring.",en:"What did you say? Speak more slowly."}
+];
+
+var RUBRIC=[
+ {id:"open",   l:"Opened with a question that let him talk",    w:"core"},
+ {id:"site",   l:"Established the site of the pain",            w:"core"},
+ {id:"onset",  l:"Established onset and duration",              w:"core"},
+ {id:"character",l:"Asked the character of the pain",           w:"core"},
+ {id:"food",   l:"Asked the relationship to food",              w:"core"},
+ {id:"severity",l:"Graded the severity",                        w:"core"},
+ {id:"relieve",l:"Asked what relieves it",                      w:"core"},
+ {id:"meds",   l:"Asked what medication he takes",              w:"crit", why:"the cause"},
+ {id:"melena", l:"Asked about the colour of his stool",         w:"crit", why:"he is bleeding"},
+ {id:"weight", l:"Asked about weight loss",                     w:"crit", why:"alarm feature"},
+ {id:"appetite",l:"Asked about appetite",                       w:"crit", why:"alarm feature"},
+ {id:"haemat", l:"Asked about vomiting blood",                  w:"core"},
+ {id:"dysphagia",l:"Asked about swallowing",                    w:"core"},
+ {id:"family", l:"Asked the family history",                    w:"crit", why:"brother, gastric cancer"},
+ {id:"pmh",    l:"Asked the past medical history",              w:"core"},
+ {id:"smoke",  l:"Asked about smoking",                         w:"core"},
+ {id:"alcohol",l:"Asked about alcohol",                         w:"core"},
+ {id:"concerns",l:"Asked what he was afraid of",                w:"crit", why:"he never says it unasked"},
+ {id:"ideas",  l:"Asked what he thought was wrong",             w:"core"},
+ {id:"expect", l:"Asked what he wanted from the visit",         w:"core"},
+ {id:"close",  l:"Closed the consultation",                     w:"core"}
+];
+
+var asked={},nQ=0,nT=0,cIdx=0,ended=false;
+var log=document.getElementById("log"),qIn=document.getElementById("q");
+
+function meter(el,val,hot){
+  var m=document.getElementById(el);
+  m.querySelector(".n").textContent=val;
+  if(hot)m.classList.add("hot");
+}
+
+function speak(uz,en){
+  var d=document.createElement("div");
+  d.className="turn";
+  var p=document.createElement("p");p.className="said";p.textContent=uz;
+  var g=document.createElement("p");g.className="gloss";g.textContent=en;
+  var b=document.createElement("button");b.className="reveal";b.type="button";
+  b.textContent="Show me what he said";
+  b.addEventListener("click",function(){
+    d.classList.add("open");nT++;meter("mT",nT,nT>=3);
+  });
+  d.appendChild(p);d.appendChild(g);d.appendChild(b);
+  log.appendChild(d);
+  log.scrollTop=log.scrollHeight;
+}
+
+function youSaid(t){
+  var d=document.createElement("div");d.className="turn";
+  var p=document.createElement("p");p.className="you";p.textContent=t;
+  d.appendChild(p);log.appendChild(d);
+}
+
+function match(text){
+  var t=" "+text.toLowerCase().replace(/[^a-z0-9ʻ'\s]/g," ").replace(/\s+/g," ")+" ";
+  var best=null,bestLen=0;
+  for(var i=0;i<SCRIPT.length;i++){
+    var it=SCRIPT[i];
+    for(var j=0;j<it.k.length;j++){
+      var kw=it.k[j];
+      if(t.indexOf(kw)>-1&&kw.length>bestLen){best=it;bestLen=kw.length;}
+    }
+  }
+  return best;
+}
+
+function ask(text){
+  if(ended||!text.trim())return;
+  youSaid(text.trim());
+  nQ++;meter("mQ",nQ);
+  var hit=match(text);
+  if(hit){
+    asked[hit.id]=true;
+    speak(hit.uz,hit.en);
+  }else{
+    var c=CONFUSED[cIdx++%CONFUSED.length];
+    speak(c.uz,c.en);
+  }
+  qIn.value="";
+}
+
+document.getElementById("send").addEventListener("click",function(){ask(qIn.value);});
+qIn.addEventListener("keydown",function(e){if(e.key==="Enter"){e.preventDefault();ask(qIn.value);}});
+Array.prototype.forEach.call(document.querySelectorAll(".starter"),function(b){
+  b.addEventListener("click",function(){ask(b.getAttribute("data-s"));});
+});
+
+document.getElementById("end").addEventListener("click",function(){
+  ended=true;
+  qIn.disabled=true;
+  document.getElementById("send").disabled=true;
+  this.disabled=true;
+
+  var critMissed=RUBRIC.filter(function(r){return r.w==="crit"&&!asked[r.id];});
+
+  var head;
+  if(asked.melena&&asked.meds&&critMissed.length===0){
+    head="You asked him everything that mattered. That is rarer than it sounds — and it took you "+nQ+" questions and "+nT+" translations to do it.";
+  }else if(!asked.melena){
+    head="You spoke with him for "+nQ+" question"+(nQ===1?"":"s")+". You never asked what colour his stool was. <span class=\"bleed\">He has been bleeding into his gut for three weeks</span> — and he was not going to tell you.";
+  }else if(!asked.meds){
+    head="You found the bleeding. You never asked what he takes for his knee — <span class=\"bleed\">the diclofenac that caused it</span> is still in his pocket, and he will go home and take it tonight.";
+  }else{
+    head="You missed "+critMissed.length+" of the questions that change what happens to him next. He will go home either way.";
+  }
+  document.getElementById("vhead").innerHTML=head;
+
+  var rub=document.getElementById("rub");
+  rub.innerHTML="";
+  RUBRIC.forEach(function(r){
+    var hitIt=!!asked[r.id];
+    var row=document.createElement("div");
+    row.className="row "+(hitIt?"got":"miss")+(r.w==="crit"?" crit":"");
+    row.innerHTML='<span class="mk">'+(hitIt?"\u2713":"\u2014")+'</span>'+
+      '<span class="lbl">'+r.l+'</span>'+
+      '<span class="tag">'+(r.w==="crit"&&!hitIt?(r.why||"critical"):"")+'</span>';
+    rub.appendChild(row);
+  });
+
+  var v=document.getElementById("verdict");
+  v.style.display="block";
+  v.scrollIntoView({behavior:(window.matchMedia&&window.matchMedia("(prefers-reduced-motion: reduce)").matches)?"auto":"smooth",block:"start"});
+});
+
+})();
+</script>
+</body>
+</html>
